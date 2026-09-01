@@ -1,5 +1,7 @@
 # ZenMoney Expense Viewer — Дашборд и аналитика личных финансов
 
+![Версия 1.0](https://img.shields.io/badge/version-1.0-blue.svg)
+
 [English](README.md) | **Русский**
 
 🔗 **Демо пример:** [https://mikhaildudin.ru/ztest/](https://mikhaildudin.ru/ztest/)

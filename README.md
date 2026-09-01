@@ -1,5 +1,7 @@
 # ZenMoney Expense Viewer — Personal Finance Dashboard & Analytics
 
+![Version 1.0](https://img.shields.io/badge/version-1.0-blue.svg)
+
 **English** | [Русский](README.ru.md)
 
 🔗 **Live Demo:** [https://mikhaildudin.ru/ztest/](https://mikhaildudin.ru/ztest/)
