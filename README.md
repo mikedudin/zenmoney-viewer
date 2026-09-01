@@ -111,13 +111,17 @@ Open in your browser: **`http://localhost:8000`**
 2. Select your exported `.csv` file.
 3. The app automatically processes all records: filters out income and internal transfers between your own accounts, eliminates duplicates, and refreshes the dashboard instantly.
 
-#### Method 2: Via Python Script
+#### Method 2: Via Python Script (For Static Hosting)
+The `convert.py` script serves as an offline data processor. It is extremely useful if you want to deploy the dashboard on purely static hosting (like GitHub Pages or AWS S3) where PHP/Node.js backend scripts cannot run to handle CSV uploads.
+
+It automatically extracts only the necessary fields, filters out incomes, internal transfers, and uncategorized transactions, and creates a lightweight JSON file for fast loading.
+
 1. Save the exported file as `data.csv` in the project root.
 2. Run the converter:
    ```bash
    python convert.py
    ```
-   The script generates an optimized `data.json`.
+3. The script generates an optimized `data.json` which you can upload directly to your static hosting alongside the frontend files.
 
 ---
 
