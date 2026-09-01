@@ -1,0 +1,218 @@
+[
+  {
+    "date": "2025-02-28",
+    "category": "Продукты",
+    "payee": "Супермаркет",
+    "comment": "Покупка продуктов на неделю",
+    "amount": 2450,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-27",
+    "category": "Кафе и рестораны",
+    "payee": "Кофейня",
+    "comment": "Капучино и десерт",
+    "amount": 350,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-26",
+    "category": "Транспорт",
+    "payee": "АЗС",
+    "comment": "Заправка АИ-95",
+    "amount": 2200,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-25",
+    "category": "Подписки",
+    "payee": "Яндекс Плюс",
+    "comment": "Семейная подписка",
+    "amount": 499,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-24",
+    "category": "Развлечения",
+    "payee": "Кинотеатр",
+    "comment": "Билеты в кино",
+    "amount": 900,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-22",
+    "category": "Продукты",
+    "payee": "Пекарня",
+    "comment": "Свежая выпечка",
+    "amount": 320,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-20",
+    "category": "Здоровье",
+    "payee": "Аптека",
+    "comment": "Витамины",
+    "amount": 1250,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-18",
+    "category": "Дом и уют",
+    "payee": "Хозтовары",
+    "comment": "Бытовая химия",
+    "amount": 840,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-16",
+    "category": "Кафе и рестораны",
+    "payee": "Пиццерия",
+    "comment": "Ужин с друзьями",
+    "amount": 1850,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-15",
+    "category": "Продукты",
+    "payee": "Рынок",
+    "comment": "Фрукты и овощи",
+    "amount": 1100,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-12",
+    "category": "Транспорт",
+    "payee": "Такси",
+    "comment": "Поездка в центр",
+    "amount": 280,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-10",
+    "category": "Одежда",
+    "payee": "Магазин одежды",
+    "comment": "Футболка и джинсы",
+    "amount": 3400,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-08",
+    "category": "Кафе и рестораны",
+    "payee": "Бургерная",
+    "comment": "Обед",
+    "amount": 420,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-05",
+    "category": "Продукты",
+    "payee": "Супермаркет",
+    "comment": "Чай, кофе, сыр",
+    "amount": 1650,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-02-01",
+    "category": "Коммуналка",
+    "payee": "Интернет-провайдер",
+    "comment": "Интернет за февраль",
+    "amount": 800,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-30",
+    "category": "Продукты",
+    "payee": "Супермаркет",
+    "comment": "Продукты на ужин",
+    "amount": 1380,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-28",
+    "category": "Развлечения",
+    "payee": "Книжный магазин",
+    "comment": "Книга по дизайну",
+    "amount": 750,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-26",
+    "category": "Кафе и рестораны",
+    "payee": "Кофейня",
+    "comment": "Завтрак",
+    "amount": 480,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-24",
+    "category": "Транспорт",
+    "payee": "АЗС",
+    "comment": "Бензин",
+    "amount": 2100,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-20",
+    "category": "Продукты",
+    "payee": "Супермаркет",
+    "comment": "Молоко, хлопья, фрукты",
+    "amount": 920,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-18",
+    "category": "Здоровье",
+    "payee": "Спортзал",
+    "comment": "Абонемент на месяц",
+    "amount": 2500,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-15",
+    "category": "Дом и уют",
+    "payee": "Посуда",
+    "comment": "Сковорода и лопатка",
+    "amount": 1600,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-12",
+    "category": "Подписки",
+    "payee": "YouTube Premium",
+    "comment": "Месячная подписка",
+    "amount": 350,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-10",
+    "category": "Кафе и рестораны",
+    "payee": "Суши-бар",
+    "comment": "Сет роллов",
+    "amount": 1400,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-08",
+    "category": "Продукты",
+    "payee": "Супермаркет",
+    "comment": "Основные продукты",
+    "amount": 2100,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-05",
+    "category": "Транспорт",
+    "payee": "Автомойка",
+    "comment": "Комплексная мойка",
+    "amount": 600,
+    "currency": "RUB"
+  },
+  {
+    "date": "2025-01-02",
+    "category": "Развлечения",
+    "payee": "Парк",
+    "comment": "Билеты на каток",
+    "amount": 800,
+    "currency": "RUB"
+  }
+]

@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Real personal financial data (ZenMoney exports)
+data.csv
+zen_history.csv
+*.csv
+!data.example.csv
+
+# Sensitive server files & logs
+.htpasswd*
+.htaccess*
+*.log
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

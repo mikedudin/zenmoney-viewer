@@ -1,0 +1,151 @@
+<?php
+/* ============================================================
+   ZenMoney Expense Viewer — index.php
+   ============================================================ */
+
+$dataFile = __DIR__ . '/data.json';
+
+// ── 1. API: Отдача данных при запросе index.php?api=data ─────
+if (isset($_GET['api']) && $_GET['api'] === 'data') {
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-cache, no-store, must-revalidate');
+    if (file_exists($dataFile)) {
+        readfile($dataFile);
+    } else {
+        echo '[]';
+    }
+    exit;
+}
+
+// ── 2. Чтение данных на сервере для инъекции в HTML ──────────
+$jsonData = '[]';
+if (file_exists($dataFile)) {
+    $content = file_get_contents($dataFile);
+    if ($content !== false && trim($content) !== '') {
+        $jsonData = trim($content);
+    }
+}
+header('Content-Type: text/html; charset=utf-8');
+?>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Расходы — ZenMoney Viewer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Color+Emoji&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-icon">₽</span>
+          <span class="logo-text">Расходы</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <div class="nav-section-label">Режим</div>
+        <button class="nav-item active" id="btn-overview" onclick="switchMode('overview')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Обзор
+        </button>
+        <button class="nav-item" id="btn-months" onclick="switchMode('months')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          По месяцам
+        </button>
+        <button class="nav-item" id="btn-categories" onclick="switchMode('categories')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+          По категориям
+        </button>
+      </nav>
+
+      <div class="sidebar-list" id="sidebar-list">
+        <!-- populated by JS -->
+      </div>
+
+      <!-- CSV Upload -->
+      <div class="sidebar-upload">
+        <label class="upload-label" for="csv-upload" id="upload-label">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span class="upload-label-text">Импорт CSV</span>
+        </label>
+        <input type="file" id="csv-upload" accept=".csv" hidden>
+      </div>
+    </aside>
+
+    <!-- Import Result Overlay -->
+    <div class="import-overlay" id="import-overlay" onclick="closeImportOverlay(event)">
+      <div class="import-modal">
+        <div class="import-modal-header">
+          <div class="import-modal-icon" id="import-modal-icon">✓</div>
+          <div class="import-modal-title" id="import-modal-title">Импорт завершён</div>
+        </div>
+        <div class="import-stats" id="import-stats"></div>
+        <div class="import-result-list" id="import-result-list"></div>
+        <button class="import-ok-btn" onclick="closeImportOverlayOk()">OK</button>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="topbar">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-title" id="page-title">Загрузка…</div>
+        <div class="topbar-meta" id="page-meta"></div>
+
+        <!-- Language Switcher -->
+        <div class="lang-switch" id="lang-switch">
+          <button class="lang-switch-btn" id="lang-switch-btn" onclick="toggleLangDropdown(event)" aria-haspopup="true" aria-expanded="false" title="Язык / Language">
+            <span class="lang-flag-icon" id="current-lang-flag">🇷🇺</span>
+            <span class="lang-label" id="current-lang-label">RU</span>
+            <svg class="lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="lang-dropdown" id="lang-dropdown" role="menu">
+            <button class="lang-item active" data-lang="ru" onclick="selectLang('ru')" role="menuitem">
+              <span class="lang-flag-icon">🇷🇺</span>
+              <span class="lang-item-name">Русский</span>
+              <svg class="lang-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+            <button class="lang-item" data-lang="en" onclick="selectLang('en')" role="menuitem">
+              <span class="lang-flag-icon">🇬🇧</span>
+              <span class="lang-item-name">English</span>
+              <svg class="lang-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div class="content" id="content">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Загрузка данных…</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script id="zen-initial-data" type="application/json">
+<?= $jsonData ?>
+  </script>
+  <script>
+    try {
+      window.INITIAL_DATA = JSON.parse(document.getElementById('zen-initial-data').textContent);
+    } catch (e) {
+      window.INITIAL_DATA = null;
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
