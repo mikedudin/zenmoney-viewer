@@ -13,7 +13,7 @@ Built entirely with vanilla JavaScript (no heavy frontend frameworks or external
 - 📊 **All-Time Overview**: Total spending, monthly spending dynamics, top category breakdown, and largest transactions.
 - 📅 **Monthly Breakdown**: Detailed analytics for any selected month, average daily spend, top categories of the month, and full transaction history.
 - 🏷️ **Category Analysis**: Spending trends over time for individual categories, payee distributions, and detailed logs.
-- 🌐 **Bilingual Interface**: Built-in support for Russian and English with a sleek dropdown switcher in the top right corner (powered by Google Noto Color Emoji).
+- 🌐 **Bilingual Interface**: Built-in support for Russian and English with a sleek dropdown switcher in the top right corner (powered by Google Noto Color Emoji). UI labels, analytics, and dates switch instantly, while individual transaction entries (category names, payees, comments) are displayed in the language you entered them in the ZenMoney app.
 - 🔄 **CSV Import with Deduplication**: Upload ZenMoney CSV exports directly through the browser UI ("Import CSV" button in the sidebar). Duplicate transactions are automatically filtered out.
 - ⚡ **Dual Backend Support**:
   - **PHP / Apache** (`index.php`, `api/data.php`, `api/import.php`) — zero setup for standard shared hosting.
@@ -98,6 +98,9 @@ Open in your browser: **`http://localhost:8000`**
 2. Navigate to **Account Settings → Export transactions to CSV** (in Russian: *Настройка аккаунта > Экспорт операций в CSV*).
 3. Select the export period: typically, choose **"Full history"** (*Вся история*) to import all past transactions.
 4. Tap **Export** and save the downloaded CSV file to your device.
+
+> [!TIP]
+> **Dataset Language:** The language switcher in the dashboard translates the interface, charts, date formatting, and system labels. The language of individual transaction entries (categories, payees, notes) depends entirely on how you entered them in the ZenMoney app.
 
 ### 💻 Importing Data into the Dashboard:
 
