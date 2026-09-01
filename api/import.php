@@ -1,4 +1,9 @@
 <?php
+// ── Suppress PHP error output to clients (M-4) ───────────────
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
 /* ============================================================
    ZenMoney — api/import.php
    Receives new expense entries (JSON POST), deduplicates
@@ -9,6 +14,21 @@
                                 createdDate }, ... ] }
    Response:   { "added": N, "skipped": N, "newEntries": [...] }
    ============================================================ */
+
+// ── CORS (M-3) ────────────────────────────────────────────────
+$allowedOrigin = getenv('APP_ORIGIN') ?: '';
+$requestOrigin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if ($allowedOrigin && $requestOrigin === $allowedOrigin) {
+    header('Access-Control-Allow-Origin: ' . $allowedOrigin);
+} elseif (!$allowedOrigin) {
+    header('Access-Control-Allow-Origin: *');
+}
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -72,10 +92,34 @@ foreach ($existing as $e) {
 // ── Find new entries ─────────────────────────────────────────
 $newEntries = [];
 $skipped    = 0;
+$ALLOWED_CURRENCIES = ['RUB', 'USD', 'EUR', 'KGS', 'KZT', 'GBP', 'CNY', 'JPY'];
 
 foreach ($incoming as $entry) {
-    $k3 = ($entry['date'] ?? '') . '|' . ($entry['category'] ?? '') . '|' . ($entry['amount'] ?? '');
-    $k4 = $k3 . '|' . ($entry['createdDate'] ?? '');
+    // ── M-1: per-field validation ─────────────────────────────
+    $date        = (string)($entry['date']        ?? '');
+    $category    = (string)($entry['category']    ?? '');
+    $payee       = (string)($entry['payee']       ?? '');
+    $comment     = (string)($entry['comment']     ?? '');
+    $amount      = (float)($entry['amount']       ?? 0);
+    $currency    = strtoupper(trim((string)($entry['currency'] ?? 'RUB')));
+    $createdDate = (string)($entry['createdDate'] ?? '');
+
+    // Date format: YYYY-MM-DD
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) { $skipped++; continue; }
+    // createdDate format: YYYY-MM-DD or empty
+    if ($createdDate !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $createdDate)) { $skipped++; continue; }
+    // Category is required
+    if ($category === '') { $skipped++; continue; }
+    // Max string lengths
+    if (mb_strlen($category) > 255 || mb_strlen($payee) > 255 ||
+        mb_strlen($comment)  > 500 || mb_strlen($currency) > 10) { $skipped++; continue; }
+    // Amount must be positive
+    if ($amount <= 0) { $skipped++; continue; }
+    // Currency whitelist
+    if (!in_array($currency, $ALLOWED_CURRENCIES, true)) { $currency = 'RUB'; }
+
+    $k3 = $date . '|' . $category . '|' . $amount;
+    $k4 = $k3 . '|' . $createdDate;
 
     // Duplicate if 4-field key already seen,
     // OR 3-field matches a legacy entry (no createdDate stored)
@@ -85,13 +129,13 @@ foreach ($incoming as $entry) {
     }
 
     $newEntries[] = [
-        'date'        => $entry['date']        ?? '',
-        'category'    => $entry['category']    ?? '',
-        'payee'       => $entry['payee']       ?? '',
-        'comment'     => $entry['comment']     ?? '',
-        'amount'      => (float)($entry['amount'] ?? 0),
-        'currency'    => $entry['currency']    ?? 'RUB',
-        'createdDate' => $entry['createdDate'] ?? '',
+        'date'        => $date,
+        'category'    => $category,
+        'payee'       => $payee,
+        'comment'     => $comment,
+        'amount'      => $amount,
+        'currency'    => $currency,
+        'createdDate' => $createdDate,
     ];
 
     // Register in sets so within-file duplicates are caught
@@ -117,8 +161,9 @@ if (count($newEntries) > 0) {
     );
 
     if ($written === false) {
+        error_log('ZenMoney import: file_put_contents failed on ' . $dataFile);
         http_response_code(500);
-        echo json_encode(['error' => 'Failed to write data.json — check file permissions (chmod 664 data.json)']);
+        echo json_encode(['error' => 'Storage error. Please contact the administrator.']);
         exit;
     }
 }

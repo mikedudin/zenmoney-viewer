@@ -1144,7 +1144,14 @@ function escHtml(s) {
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function escAttr(s) { return escHtml(s); }
+function escAttr(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 function safeId(s)  { return btoa(encodeURIComponent(s)).replace(/[^a-z0-9]/gi,''); }
 
 // ── Start ─────────────────────────────────────────────────────
