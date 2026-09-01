@@ -417,13 +417,62 @@ html, body { height: 100%; font-family: var(--font); background: var(--color-bg)
 
 /* ── Responsive ── */
 @media (max-width: 680px) {
-  :root { --sidebar-w: 220px; }
-  .sidebar { position: fixed; height: 100vh; top: 0; left: 0; }
-  .sidebar.collapsed { width: 0; }
+  :root { --sidebar-w: 280px; }
+
+  /* Sidebar slides in as a drawer over the content */
+  .sidebar {
+    position: fixed;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform var(--transition), box-shadow var(--transition);
+    width: var(--sidebar-w) !important;
+    min-width: var(--sidebar-w) !important;
+    box-shadow: none;
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Backdrop overlay */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 199;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition);
+  }
+  .sidebar-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Main always takes full width on mobile */
+  .main { width: 100%; }
+
   .content { padding: 16px; }
   .summary-cards { grid-template-columns: 1fr 1fr; }
-  .chart-bar-label { width: 100px; }
+  .chart-bar-label { width: 80px; min-width: 60px; }
+
+  /* Topbar adjustments */
+  .topbar { padding: 0 16px; gap: 12px; }
+  .topbar-meta { display: none; }
+
+  /* Table horizontal scroll on mobile */
+  .entries-body { overflow-x: auto; }
+  .entries-table { min-width: 400px; }
+
+  /* Leaderboard bar narrower */
+  .lb-bar-track { width: 48px; }
+  .lb-total { width: 70px; font-size: 12px; }
 }
+
 
 /* ── Card utility ── */
 .card {

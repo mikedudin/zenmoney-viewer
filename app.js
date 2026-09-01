@@ -287,6 +287,11 @@ const sumAmount       = (arr)  => arr.reduce((s, e) => s + e.amount, 0);
 
 // ── Init ─────────────────────────────────────────────────────
 async function init() {
+  // On mobile, sidebar starts closed so the content is immediately accessible
+  if (window.innerWidth <= 680) {
+    sidebarOpen = false;
+  }
+
   // Setup language switcher outside click listener
   document.addEventListener('click', (e) => {
     const container = document.getElementById('lang-switch');
@@ -297,6 +302,7 @@ async function init() {
 
   // Apply initial translations
   updateStaticTranslations();
+
 
   // Wire CSV upload input
   document.getElementById('csv-upload').addEventListener('change', function () {
@@ -408,18 +414,48 @@ function switchMode(m) {
   }
   renderSidebar();
   renderContent();
+  // Close sidebar drawer on mobile after selection
+  if (isMobile()) closeSidebarMobile();
 }
 
 function selectItem(key) {
   selected = key;
   renderSidebar();
   renderContent();
+  // Close sidebar drawer on mobile after selection
+  if (isMobile()) closeSidebarMobile();
+}
+
+
+function isMobile() {
+  return window.innerWidth <= 680;
+}
+
+function openSidebarMobile() {
+  document.getElementById('sidebar').classList.add('mobile-open');
+  document.getElementById('sidebar-backdrop').classList.add('active');
+  sidebarOpen = true;
+}
+
+function closeSidebarMobile() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-backdrop').classList.remove('active');
+  sidebarOpen = false;
 }
 
 function toggleSidebar() {
-  sidebarOpen = !sidebarOpen;
-  document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
+  if (isMobile()) {
+    if (sidebarOpen) {
+      closeSidebarMobile();
+    } else {
+      openSidebarMobile();
+    }
+  } else {
+    sidebarOpen = !sidebarOpen;
+    document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
+  }
 }
+
 
 function renderContent() {
   if      (mode === 'overview')    renderOverview();
