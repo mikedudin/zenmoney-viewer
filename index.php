@@ -46,7 +46,7 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="logo">
           <span class="logo-icon">₽</span>
           <span class="logo-text">Расходы</span>
-          <span class="app-version">v1.0.1</span>
+          <span class="app-version">v1.0.2</span>
         </div>
       </div>
 
