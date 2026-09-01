@@ -6,6 +6,20 @@
 
 🔗 **Live Demo:** [https://mikhaildudin.ru/ztest/](https://mikhaildudin.ru/ztest/)
 
+> [!CAUTION]
+> **Authentication Required Before Deploying**
+>
+> This app displays your **personal financial data** (spending history, transaction amounts, categories, payees). The repository does **not include any authentication mechanism** — the demo page is intentionally open and public, serving only anonymized example data.
+>
+> **You must configure authentication on your server before deploying this app with real data.** Without it, anyone with the URL can view your complete financial history.
+>
+> Recommended options depending on your hosting:
+> - **Apache / cPanel**: HTTP Basic Auth via `.htaccess` + `.htpasswd` (see the [Security & Privacy](#-security--privacy) section below)
+> - **Node.js / Nginx / Caddy**: reverse-proxy with password protection or session-based auth middleware
+> - **Static hosting** (GitHub Pages, S3, Netlify, etc.): protect at the CDN/platform level (e.g. Netlify Identity, Cloudflare Access) or avoid deploying real data there entirely
+>
+> ⚠️ Failure to add authentication will expose all your financial records to the public internet.
+
 A modern, fast, and standalone web dashboard for visualizing and analyzing personal expenses exported from **ZenMoney** ([Android](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub) / [iOS](https://apps.apple.com/ru/app/дзен-мани-учет-расходов/id905934786)).
 
 Built entirely with vanilla JavaScript (no heavy frontend frameworks or external runtime dependencies). Loads instantly in the browser and supports deployment on both **PHP** shared hosting and **Node.js** servers.
@@ -131,16 +145,54 @@ It automatically extracts only the necessary fields, filters out incomes, intern
 
 ## 🔐 Security & Privacy
 
+> [!CAUTION]
+> **This repository does not include any authentication.** The demo page at [mikhaildudin.ru/ztest/](https://mikhaildudin.ru/ztest/) is publicly accessible and uses only anonymized sample data — it intentionally has no login protection.
+>
+> **You are strictly required to add authentication before deploying this app with your real financial data.** Your exported data contains sensitive personal information (exact spending amounts, merchant names, categories, dates). Leaving it unprotected on a public URL is a serious privacy and security risk.
+
+### Authentication Setup by Hosting Type
+
+**Apache / cPanel (shared hosting) — HTTP Basic Auth:**
+
+Create `.htaccess` and `.htpasswd` directly on your server (do **not** commit these files to Git — they are excluded via `.gitignore`):
+
+```apache
+AuthType Basic
+AuthName "ZenMoney Viewer — Restricted Access"
+AuthUserFile /full/server/path/to/.htpasswd
+Require valid-user
+```
+
+Generate the password hash (run on your server or locally with Apache utils):
+```bash
+htpasswd -c /full/server/path/to/.htpasswd your_username
+```
+
+**Node.js — Basic Auth middleware:**
+```bash
+npm install express-basic-auth
+```
+```js
+const basicAuth = require('express-basic-auth');
+app.use(basicAuth({ users: { 'admin': 'your_strong_password' }, challenge: true }));
+```
+
+**Static hosting (GitHub Pages, Netlify, AWS S3, etc.):**
+These platforms cannot enforce server-side auth on their own. Use one of:
+- **Cloudflare Access** (free tier available) — adds login in front of any public URL
+- **Netlify Identity** — built-in auth gate for Netlify deployments
+- Or simply **do not deploy real data to static hosting** — use `convert.py` only locally and only upload to a protected server
+
 > [!IMPORTANT]
 > Never commit or publish your personal `data.json`, `*.csv` export files, or `.htpasswd` passwords file to public GitHub repositories. The repository includes a pre-configured `.gitignore` that automatically excludes these files.
 
-On Apache servers, it is recommended to keep direct file access denied:
+**Apache — block direct file downloads:**
 ```apache
-<FilesMatch "^(data\.json|data\.csv|zen_history\.csv|convert\.py|...)">
+<FilesMatch "^(data\.json|data\.csv|zen_history\.csv|convert\.py|\.htpasswd)">
     Require all denied
 </FilesMatch>
 ```
-This prevents sensitive raw files from being directly downloaded by URL.
+This prevents sensitive raw files from being directly downloaded by URL even if someone guesses the path.
 
 ---
 

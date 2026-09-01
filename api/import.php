@@ -19,6 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// ── Payload size guard (H-2) ─────────────────────────────────
+$maxBytes = 1048576; // 1 MB
+if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > $maxBytes) {
+    http_response_code(413);
+    echo json_encode(['error' => 'Payload too large']);
+    exit;
+}
+
 // ── Read & validate incoming JSON body ───────────────────────
 $raw      = file_get_contents('php://input');
 $body     = json_decode($raw, true);
@@ -27,6 +35,13 @@ $incoming = $body['entries'] ?? null;
 if (!is_array($incoming) || count($incoming) === 0) {
     http_response_code(400);
     echo json_encode(['error' => 'No entries provided']);
+    exit;
+}
+
+// ── Entry count guard (H-2) ──────────────────────────────────
+if (count($incoming) > 5000) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Too many entries (max 5000)']);
     exit;
 }
 

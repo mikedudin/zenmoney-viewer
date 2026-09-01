@@ -332,7 +332,7 @@ async function init() {
     renderContent();
   } catch (err) {
     document.getElementById('content').innerHTML =
-      `<div class="loading-state"><p style="color:var(--color-red)">${t('loadError')}${err.message}</p></div>`;
+      `<div class="loading-state"><p style="color:var(--color-red)">${t('loadError')}${escHtml(err.message)}</p></div>`;
   }
 }
 
@@ -614,9 +614,9 @@ function showImportResult(result) {
       .sort((a, b) => b.date.localeCompare(a.date))
       .map(e => `
         <div class="import-result-row">
-          <span class="import-result-date">${e.date}</span>
+          <span class="import-result-date">${escHtml(e.date)}</span>
           <span class="import-result-cat">${escHtml(e.category)}</span>
-          <span class="import-result-amt">−${fmt(e.amount)} ${e.currency}</span>
+          <span class="import-result-amt">−${fmt(e.amount)} ${escHtml(e.currency)}</span>
         </div>`).join('');
   } else {
     listEl.classList.remove('has-items');

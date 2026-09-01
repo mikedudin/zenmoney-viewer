@@ -14,7 +14,7 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '1mb' }));
 app.use(express.static(__dirname));
 
 /* ── GET /api/data & /api/data.php ─────────────────────────── */
@@ -37,6 +37,9 @@ app.post(['/api/import', '/api/import.php'], (req, res) => {
     const incoming = req.body.entries;
     if (!Array.isArray(incoming) || incoming.length === 0) {
       return res.status(400).json({ error: 'No entries provided' });
+    }
+    if (incoming.length > 5000) {
+      return res.status(400).json({ error: 'Too many entries (max 5000)' });
     }
 
     // Load current data.json
