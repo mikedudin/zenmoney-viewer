@@ -11,14 +11,16 @@
 >
 > This app displays your **personal financial data** (spending history, transaction amounts, categories, payees). The repository does **not include any authentication mechanism** — the demo page is intentionally open and public, serving only anonymized example data.
 >
-> **You must configure authentication on your server before deploying this app with real data.** Without it, anyone with the URL can view your complete financial history.
+> **You must configure authentication on your server before deploying this app with real data.** Without it, anyone with the URL can:
+> - 👁️ **View** your complete financial history
+> - 💾 **Overwrite or corrupt your data** — the CSV import endpoint (`api/import.php` / Node.js import route) is publicly accessible and will replace `data.json` with whatever file is uploaded, causing **irreversible data loss**
 >
 > Recommended options depending on your hosting:
 > - **Apache / cPanel**: HTTP Basic Auth via `.htaccess` + `.htpasswd` (see the [Security & Privacy](#-security--privacy) section below)
 > - **Node.js / Nginx / Caddy**: reverse-proxy with password protection or session-based auth middleware
 > - **Static hosting** (GitHub Pages, S3, Netlify, etc.): protect at the CDN/platform level (e.g. Netlify Identity, Cloudflare Access) or avoid deploying real data there entirely
 >
-> ⚠️ Failure to add authentication will expose all your financial records to the public internet.
+> ⚠️ Failure to add authentication will expose all your financial records to the public internet and leave your stored data vulnerable to accidental or malicious overwrite.
 
 A modern, fast, and standalone web dashboard for visualizing and analyzing personal expenses exported from **ZenMoney** ([Android](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub) / [iOS](https://apps.apple.com/ru/app/дзен-мани-учет-расходов/id905934786)).
 
@@ -148,7 +150,9 @@ It automatically extracts only the necessary fields, filters out incomes, intern
 > [!CAUTION]
 > **This repository does not include any authentication.** The demo page at [mikhaildudin.ru/ztest/](https://mikhaildudin.ru/ztest/) is publicly accessible and uses only anonymized sample data — it intentionally has no login protection.
 >
-> **You are strictly required to add authentication before deploying this app with your real financial data.** Your exported data contains sensitive personal information (exact spending amounts, merchant names, categories, dates). Leaving it unprotected on a public URL is a serious privacy and security risk.
+> **You are strictly required to add authentication before deploying this app with your real financial data.** Without access restrictions, anyone who discovers the URL can:
+> - 👁️ **Read** all your financial records
+> - 💾 **Overwrite or permanently destroy your data** — the CSV import endpoint (`api/import.php` / Node.js import route) is unauthenticated and will silently replace `data.json` with any uploaded file, causing **irreversible data loss**
 
 ### Authentication Setup by Hosting Type
 
