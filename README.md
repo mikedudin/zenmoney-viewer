@@ -2,7 +2,7 @@
 
 **English** | [Русский](README.ru.md)
 
-A modern, fast, and standalone web dashboard for visualizing and analyzing personal expenses exported from the **[ZenMoney Android app](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub)**.
+A modern, fast, and standalone web dashboard for visualizing and analyzing personal expenses exported from **ZenMoney** ([Android](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub) / [iOS](https://apps.apple.com/ru/app/дзен-мани-учет-расходов/id905934786)).
 
 Built entirely with vanilla JavaScript (no heavy frontend frameworks or external runtime dependencies). Loads instantly in the browser and supports deployment on both **PHP** shared hosting and **Node.js** servers.
 
@@ -94,7 +94,7 @@ Open in your browser: **`http://localhost:8000`**
 ## 📥 How to Export Data from ZenMoney
 
 ### 📲 Exporting from the ZenMoney App:
-1. Open the [ZenMoney Android app](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub) (or web version).
+1. Open the ZenMoney app ([Android](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub) / [iOS](https://apps.apple.com/ru/app/дзен-мани-учет-расходов/id905934786) or web version).
 2. Navigate to **Account Settings → Export transactions to CSV** (in Russian: *Настройка аккаунта > Экспорт операций в CSV*).
 3. Select the export period: typically, choose **"Full history"** (*Вся история*) to import all past transactions.
 4. Tap **Export** and save the downloaded CSV file to your device.

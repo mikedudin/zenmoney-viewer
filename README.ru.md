@@ -2,7 +2,7 @@
 
 [English](README.md) | **Русский**
 
-Современный, быстрый и автономный веб-дашборд для наглядного анализа личных расходов из приложения **[Дзен-мани (ZenMoney)](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub)**.
+Современный, быстрый и автономный веб-дашборд для наглядного анализа личных расходов из приложения **Дзен-мани (ZenMoney)** ([Android](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub) / [iOS](https://apps.apple.com/ru/app/дзен-мани-учет-расходов/id905934786)).
 
 Работает полностью на чистом JavaScript (без фреймворков и тяжелых библиотек), мгновенно открывается в браузере и поддерживает запуск как на **PHP**-хостинге, так и на **Node.js**.
 
@@ -94,7 +94,7 @@ php -S localhost:8000
 ## 📥 Как экспортировать данные из Дзен-мани (ZenMoney)
 
 ### 📲 Экспорт из приложения Дзен-мани:
-1. Откройте приложение [Дзен-мани на Android](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub) (или в веб-версии).
+1. Откройте приложение Дзен-мани ([Android](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub) / [iOS](https://apps.apple.com/ru/app/дзен-мани-учет-расходов/id905934786) или в веб-версии).
 2. Перейдите в **Настройка аккаунта → Экспорт операций в CSV** (*Account Settings > Export transactions to CSV*).
 3. Выберите период: как правило, для полной картины расходов выбирают **«Вся история»** (*Full history*).
 4. Нажмите **Экспортировать** и сохраните полученный CSV-файл на устройство.
