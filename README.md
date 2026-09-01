@@ -67,7 +67,7 @@ Open in your browser: **`http://localhost:3000`**
 
 ### Option 2: Run with PHP Built-in Server (Local)
 
-If you have PHP installed:
+If you have PHP 7.0+ installed:
 
 ```bash
 php -S localhost:8000
@@ -77,6 +77,8 @@ Open in your browser: **`http://localhost:8000`**
 ---
 
 ### Option 3: Deploy to Web Hosting (Apache / cPanel / LAMP)
+
+Requires **PHP 7.0+**.
 
 1. Upload the repository files to your web server directory (e.g. `public_html/zmoney/`).
 2. To password-protect access, set up Basic Auth in `.htaccess` and `.htpasswd` directly on the server:
@@ -112,7 +114,7 @@ Open in your browser: **`http://localhost:8000`**
 3. The app automatically processes all records: filters out income and internal transfers between your own accounts, eliminates duplicates, and refreshes the dashboard instantly.
 
 #### Method 2: Via Python Script (For Static Hosting)
-The `convert.py` script serves as an offline data processor. It is extremely useful if you want to deploy the dashboard on purely static hosting (like GitHub Pages or AWS S3) where PHP/Node.js backend scripts cannot run to handle CSV uploads.
+The `convert.py` script (requires **Python 3.6+**) serves as an offline data processor. It is extremely useful if you want to deploy the dashboard on purely static hosting (like GitHub Pages or AWS S3) where PHP/Node.js backend scripts cannot run to handle CSV uploads.
 
 It automatically extracts only the necessary fields, filters out incomes, internal transfers, and uncategorized transactions, and creates a lightweight JSON file for fast loading.
 
