@@ -1,6 +1,8 @@
-# ₽ ZenMoney Expense Viewer
+# ZenMoney Expense Viewer — Personal Finance Dashboard & Analytics
 
 **English** | [Русский](README.ru.md)
+
+🔗 **Live Demo:** [https://mikhaildudin.ru/ztest/](https://mikhaildudin.ru/ztest/)
 
 A modern, fast, and standalone web dashboard for visualizing and analyzing personal expenses exported from **ZenMoney** ([Android](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub) / [iOS](https://apps.apple.com/ru/app/дзен-мани-учет-расходов/id905934786)).
 

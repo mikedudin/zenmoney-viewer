@@ -1,6 +1,8 @@
-# ₽ ZenMoney Expense Viewer
+# ZenMoney Expense Viewer — Дашборд и аналитика личных финансов
 
 [English](README.md) | **Русский**
+
+🔗 **Демо пример:** [https://mikhaildudin.ru/ztest/](https://mikhaildudin.ru/ztest/)
 
 Современный, быстрый и автономный веб-дашборд для наглядного анализа личных расходов из приложения **Дзен-мани (ZenMoney)** ([Android](https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub) / [iOS](https://apps.apple.com/ru/app/дзен-мани-учет-расходов/id905934786)).
 
