@@ -1,6 +1,6 @@
 {
   "name": "zenmoney-viewer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ZenMoney expense viewer with CSV import",
   "main": "server.js",
   "scripts": {
