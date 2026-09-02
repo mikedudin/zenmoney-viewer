@@ -300,9 +300,73 @@ async function init() {
     }
   });
 
+  // Navigation mode buttons
+  document.querySelectorAll('[data-action="switch-mode"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchMode(btn.dataset.mode);
+    });
+  });
+
+  // Language selector items
+  document.querySelectorAll('[data-action="select-lang"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectLang(btn.dataset.lang);
+    });
+  });
+
+  // Sidebar toggle & backdrop
+  const toggleBtn = document.getElementById('sidebar-toggle');
+  if (toggleBtn) toggleBtn.addEventListener('click', toggleSidebar);
+
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (backdrop) backdrop.addEventListener('click', closeSidebarMobile);
+
+  // Language dropdown toggle
+  const langBtn = document.getElementById('lang-switch-btn');
+  if (langBtn) langBtn.addEventListener('click', toggleLangDropdown);
+
+  // Import overlay backdrop & OK button
+  const overlay = document.getElementById('import-overlay');
+  if (overlay) overlay.addEventListener('click', closeImportOverlay);
+
+  const okBtn = document.getElementById('import-ok-btn');
+  if (okBtn) okBtn.addEventListener('click', closeImportOverlayOk);
+
+  // Delegated clicks for dynamic sidebar items
+  const sidebarList = document.getElementById('sidebar-list');
+  if (sidebarList) {
+    sidebarList.addEventListener('click', (e) => {
+      const entry = e.target.closest('[data-action="select-item"]');
+      if (entry && entry.dataset.key) {
+        selectItem(entry.dataset.key);
+      }
+    });
+  }
+
+  // Delegated clicks for dynamic content (heatmaps, leaderboard, accordions)
+  const contentEl = document.getElementById('content');
+  if (contentEl) {
+    contentEl.addEventListener('click', (e) => {
+      const lbItem = e.target.closest('[data-action="go-to-category"]');
+      if (lbItem && lbItem.dataset.cat) {
+        goToCategory(lbItem.dataset.cat);
+        return;
+      }
+      const cell = e.target.closest('[data-action="heatmap-day"]');
+      if (cell && cell.dataset.date) {
+        heatmapDayClick(cell.dataset.date);
+        return;
+      }
+      const accordionHeader = e.target.closest('[data-action="toggle-accordion"]');
+      if (accordionHeader && accordionHeader.dataset.target) {
+        toggleAccordion(accordionHeader.dataset.target);
+        return;
+      }
+    });
+  }
+
   // Apply initial translations
   updateStaticTranslations();
-
 
   // Wire CSV upload input
   document.getElementById('csv-upload').addEventListener('change', function () {
@@ -322,7 +386,7 @@ async function init() {
           res = await fetch('index.php?api=data');
           if (!res.ok) throw new Error();
         } catch (_) {
-          res = await fetch('data.json');
+          res = await fetch('api/data');
         }
       }
       allData = await res.json();
@@ -370,7 +434,7 @@ function renderSidebar() {
         const total    = sumAmount(byMonth[k]);
         const isActive = k === selected;
         const monthNum = +k.split('-')[1] - 1;
-        html += `<div class="sidebar-entry${isActive ? ' active' : ''}" onclick="selectItem('${k}')">
+        html += `<div class="sidebar-entry${isActive ? ' active' : ''}" data-action="select-item" data-key="${escAttr(k)}">
           <span class="sidebar-entry-label">${monthsArr[monthNum]}</span>
           <span class="sidebar-entry-amount">${fmt(total)}</span>
         </div>`;
@@ -387,7 +451,7 @@ function renderSidebar() {
   for (const cat of cats) {
     const total    = sumAmount(byCat[cat]);
     const isActive = cat === selected;
-    html += `<div class="sidebar-entry${isActive ? ' active' : ''}" onclick="selectItem('${escAttr(cat)}')">
+    html += `<div class="sidebar-entry${isActive ? ' active' : ''}" data-action="select-item" data-key="${escAttr(cat)}">
       <span class="sidebar-entry-label">${escHtml(cat)}</span>
       <span class="sidebar-entry-amount">${fmt(total)}</span>
     </div>`;
@@ -554,18 +618,24 @@ async function handleCsvUpload(file) {
       return;
     }
 
+    const importHeaders = {
+      'Content-Type': 'application/json',
+      'X-Zen-Viewer': '1',
+      'X-Requested-With': 'XMLHttpRequest',
+    };
+
     let resp;
     try {
       resp = await fetch('api/import.php', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: importHeaders,
         body:    JSON.stringify({ entries }),
       });
       if (!resp.ok) throw new Error();
     } catch (_) {
       resp = await fetch('api/import', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: importHeaders,
         body:    JSON.stringify({ entries }),
       });
     }
@@ -665,7 +735,7 @@ async function closeImportOverlayOk() {
         res = await fetch('index.php?api=data&t=' + tstamp);
         if (!res.ok) throw new Error();
       } catch (_) {
-        res = await fetch('data.json?' + tstamp);
+        res = await fetch('api/data?' + tstamp);
       }
     }
     allData = await res.json();
@@ -801,7 +871,7 @@ function buildHeatmap(byDate) {
         const title = day.amount
           ? `${day.date}: −${fmtAmt(day.amount)}`
           : `${day.date}: ${t('noExpenses')}`;
-        weeksHtml += `<div class="heatmap-cell" style="background:${bg}" title="${title}" onclick="heatmapDayClick('${day.date}')"></div>`;
+        weeksHtml += `<div class="heatmap-cell" style="background:${bg}" title="${title}" data-action="heatmap-day" data-date="${escAttr(day.date)}"></div>`;
       }
     }
     weeksHtml += `</div>`;
@@ -865,7 +935,7 @@ function buildLeaderboard(cats, grandTotal) {
     const color = catColor(cat);
 
     rows += `
-    <div class="lb-item" title="${t('clickToView')}" onclick="goToCategory('${escAttr(cat)}')" style="cursor:pointer">
+    <div class="lb-item" title="${t('clickToView')}" data-action="go-to-category" data-cat="${escAttr(cat)}" style="cursor:pointer">
       <div class="lb-rank ${RANK_CLASSES[i]}">${i + 1}</div>
       <div class="lb-dot" style="background:${color}"></div>
       <div class="lb-name">${escHtml(cat)}</div>
@@ -1008,7 +1078,7 @@ function renderMonthView() {
     const id    = 'cat-' + safeId(cat);
     html += `
     <div class="category-item" id="${id}">
-      <div class="category-header" onclick="toggleAccordion('${id}')">
+      <div class="category-header" data-action="toggle-accordion" data-target="${escAttr(id)}">
         <div class="category-color-dot" style="background:${color}"></div>
         <div class="category-name">${escHtml(cat)}</div>
         <span class="category-count">${items.length}</span>
@@ -1095,7 +1165,7 @@ function renderCategoryView() {
     const mid   = 'month-' + k.replace('-', '');
     html += `
     <div class="month-block" id="${mid}">
-      <div class="month-block-header" onclick="toggleAccordion('${mid}')">
+      <div class="month-block-header" data-action="toggle-accordion" data-target="${escAttr(mid)}">
         <div class="category-color-dot" style="background:${color}"></div>
         <div class="month-block-name">${monthLabel(k)}</div>
         <span class="month-block-count">${items.length}</span>

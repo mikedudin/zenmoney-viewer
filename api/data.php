@@ -5,14 +5,19 @@
    ============================================================ */
 
 header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Cache-Control: no-store, no-cache, must-revalidate, private');
+header('Pragma: no-cache');
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header('Referrer-Policy: strict-origin-when-cross-origin');
 
 $dataFile = __DIR__ . '/../data.json';
+$exampleFile = __DIR__ . '/../data.example.json';
 
-if (!file_exists($dataFile)) {
-    http_response_code(404);
-    echo json_encode(['error' => 'Файл данных data.json не найден']);
-    exit;
+if (file_exists($dataFile)) {
+    readfile($dataFile);
+} elseif (file_exists($exampleFile)) {
+    readfile($exampleFile);
+} else {
+    echo '[]';
 }
-
-readfile($dataFile);

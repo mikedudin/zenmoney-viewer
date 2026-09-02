@@ -1,11 +1,16 @@
 # Dependencies
 node_modules/
 
-# Real personal financial data (ZenMoney exports)
+# Real personal financial data (ZenMoney exports and database)
 data.csv
 zen_history.csv
 *.csv
 !data.example.csv
+data.json
+data.json.bak*
+data.json.lock*
+data.json.tmp*
+!data.example.json
 
 # Sensitive server files & logs
 .htpasswd*

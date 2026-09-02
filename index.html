@@ -4,15 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Расходы — ZenMoney Viewer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Color+Emoji&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="app">
     <!-- Mobile sidebar backdrop -->
-    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebarMobile()"></div>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
@@ -20,21 +17,21 @@
         <div class="logo">
           <span class="logo-icon">₽</span>
           <span class="logo-text">Расходы</span>
-          <span class="app-version">v1.0.4</span>
+          <span class="app-version">v1.0.5</span>
         </div>
       </div>
 
       <nav class="nav">
         <div class="nav-section-label">Режим</div>
-        <button class="nav-item active" id="btn-overview" onclick="switchMode('overview')">
+        <button class="nav-item active" id="btn-overview" data-action="switch-mode" data-mode="overview">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
           Обзор
         </button>
-        <button class="nav-item" id="btn-months" onclick="switchMode('months')">
+        <button class="nav-item" id="btn-months" data-action="switch-mode" data-mode="months">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           По месяцам
         </button>
-        <button class="nav-item" id="btn-categories" onclick="switchMode('categories')">
+        <button class="nav-item" id="btn-categories" data-action="switch-mode" data-mode="categories">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
           По категориям
         </button>
@@ -59,7 +56,7 @@
     </aside>
 
     <!-- Import Result Overlay -->
-    <div class="import-overlay" id="import-overlay" onclick="closeImportOverlay(event)">
+    <div class="import-overlay" id="import-overlay">
       <div class="import-modal">
         <div class="import-modal-header">
           <div class="import-modal-icon" id="import-modal-icon">✓</div>
@@ -67,14 +64,14 @@
         </div>
         <div class="import-stats" id="import-stats"></div>
         <div class="import-result-list" id="import-result-list"></div>
-        <button class="import-ok-btn" onclick="closeImportOverlayOk()">OK</button>
+        <button class="import-ok-btn" id="import-ok-btn">OK</button>
       </div>
     </div>
 
     <!-- Main -->
     <main class="main">
       <header class="topbar">
-        <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle navigation">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <div class="topbar-title" id="page-title">Загрузка…</div>
@@ -82,18 +79,18 @@
 
         <!-- Language Switcher -->
         <div class="lang-switch" id="lang-switch">
-          <button class="lang-switch-btn" id="lang-switch-btn" onclick="toggleLangDropdown(event)" aria-haspopup="true" aria-expanded="false" title="Язык / Language">
+          <button class="lang-switch-btn" id="lang-switch-btn" aria-haspopup="true" aria-expanded="false" title="Язык / Language">
             <span class="lang-flag-icon" id="current-lang-flag">🇷🇺</span>
             <span class="lang-label" id="current-lang-label">RU</span>
             <svg class="lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="lang-dropdown" id="lang-dropdown" role="menu">
-            <button class="lang-item active" data-lang="ru" onclick="selectLang('ru')" role="menuitem">
+            <button class="lang-item active" data-action="select-lang" data-lang="ru" role="menuitem">
               <span class="lang-flag-icon">🇷🇺</span>
               <span class="lang-item-name">Русский</span>
               <svg class="lang-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             </button>
-            <button class="lang-item" data-lang="en" onclick="selectLang('en')" role="menuitem">
+            <button class="lang-item" data-action="select-lang" data-lang="en" role="menuitem">
               <span class="lang-flag-icon">🇬🇧</span>
               <span class="lang-item-name">English</span>
               <svg class="lang-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
