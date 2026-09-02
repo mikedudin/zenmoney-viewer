@@ -10,6 +10,8 @@ data.json
 data.json.bak*
 data.json.lock*
 data.json.tmp*
+backups/
+*.bak*
 !data.example.json
 
 # Sensitive server files & logs

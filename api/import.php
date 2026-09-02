@@ -180,10 +180,21 @@ function cleanString($str, $maxLen) {
     return $s;
 }
 
+function validateDatasetSchema($data) {
+    if (!is_array($data)) return false;
+    foreach ($data as $e) {
+        if (!is_array($e)) return false;
+        if (!isset($e['date'], $e['category'], $e['amount'])) return false;
+        if (!is_numeric($e['amount'])) return false;
+    }
+    return true;
+}
+
 // ── Acquire Exclusive Process Lock for Read-Modify-Write ────
 $dataFile   = __DIR__ . '/../data.json';
 $lockFile   = __DIR__ . '/../data.json.lock';
 $backupFile = __DIR__ . '/../data.json.bak';
+$backupDir  = __DIR__ . '/../backups';
 
 $lockFp = @fopen($lockFile, 'c+');
 if (!$lockFp || !flock($lockFp, LOCK_EX)) {
@@ -198,13 +209,13 @@ if (file_exists($dataFile)) {
     $existingContent = file_get_contents($dataFile);
     if ($existingContent !== false && trim($existingContent) !== '') {
         $decoded = json_decode($existingContent, true);
-        if (!is_array($decoded)) {
-            // Existing data is corrupted — refuse to overwrite!
+        if (!validateDatasetSchema($decoded)) {
+            // Existing data is corrupted or invalid schema — refuse to overwrite!
             flock($lockFp, LOCK_UN);
             fclose($lockFp);
-            error_log('ZenMoney import: data.json is corrupted; aborting merge to prevent data loss.');
+            error_log('ZenMoney import: data.json schema is corrupted or malformed; aborting merge to prevent data loss.');
             http_response_code(500);
-            echo json_encode(['error' => 'Database integrity error: existing data is malformed.']);
+            echo json_encode(['error' => 'Database integrity error: existing data schema is malformed.']);
             exit;
         }
         $existing = $decoded;
@@ -329,9 +340,37 @@ if (count($newEntries) > 0) {
         exit;
     }
 
-    // Automated backup of current database
+    // Automated verified backup of current database
     if (file_exists($dataFile)) {
-        @copy($dataFile, $backupFile);
+        if (!is_dir($backupDir)) {
+            @mkdir($backupDir, 0700, true);
+            @file_put_contents($backupDir . '/.htaccess', "Require all denied\n");
+        }
+        $tsBackup = $backupDir . '/data-' . gmdate('Ymd-His') . '-' . bin2hex(random_bytes(4)) . '.json';
+
+        $copiedTs = @copy($dataFile, $tsBackup);
+        $copiedBak = @copy($dataFile, $backupFile);
+
+        if (!$copiedTs || !$copiedBak || filesize($tsBackup) !== filesize($dataFile)) {
+            flock($lockFp, LOCK_UN);
+            fclose($lockFp);
+            error_log('ZenMoney import: failed to create verified backup of ' . $dataFile);
+            http_response_code(500);
+            echo json_encode(['error' => 'Storage backup failure. Import aborted to prevent data loss.']);
+            exit;
+        }
+        @chmod($tsBackup, 0600);
+        @chmod($backupFile, 0600);
+
+        // Keep latest 10 timestamped backups
+        $backupFiles = glob($backupDir . '/data-*.json');
+        if (is_array($backupFiles) && count($backupFiles) > 10) {
+            usort($backupFiles, function($a, $b) { return filemtime($a) - filemtime($b); });
+            while (count($backupFiles) > 10) {
+                $oldest = array_shift($backupFiles);
+                @unlink($oldest);
+            }
+        }
     }
 
     // Atomic write via unique temporary file + rename

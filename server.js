@@ -20,6 +20,8 @@ const HOST = process.env.HOST || '127.0.0.1';
 const DATA_FILE    = path.join(__dirname, 'data.json');
 const EXAMPLE_FILE = path.join(__dirname, 'data.example.json');
 const BACKUP_FILE  = path.join(__dirname, 'data.json.bak');
+const BACKUP_DIR   = path.join(__dirname, 'backups');
+const LOCK_FILE    = path.join(__dirname, 'data.json.lock');
 
 const ALLOWED_ORIGIN = process.env.APP_ORIGIN || null;
 const ALLOWED_CURRENCIES = new Set(['RUB', 'USD', 'EUR', 'KGS', 'KZT', 'GBP', 'CNY', 'JPY']);
@@ -114,6 +116,52 @@ function cleanString(str, maxLen) {
   return s.length > maxLen ? s.slice(0, maxLen) : s;
 }
 
+function validateDatasetSchema(data) {
+  if (!Array.isArray(data)) return false;
+  for (const e of data) {
+    if (!e || typeof e !== 'object') return false;
+    if (typeof e.date !== 'string' || typeof e.category !== 'string') return false;
+    if (typeof e.amount !== 'number' || !Number.isFinite(e.amount)) return false;
+  }
+  return true;
+}
+
+function acquireCrossProcessLock(maxWaitMs = 5000, staleMs = 10000) {
+  const start = Date.now();
+  while (Date.now() - start < maxWaitMs) {
+    try {
+      const fd = fs.openSync(LOCK_FILE, 'wx');
+      fs.writeSync(fd, `${process.pid}\n${Date.now()}`);
+      return fd;
+    } catch (err) {
+      if (err.code === 'EEXIST') {
+        try {
+          const stats = fs.statSync(LOCK_FILE);
+          if (Date.now() - stats.mtimeMs > staleMs) {
+            fs.unlinkSync(LOCK_FILE);
+            continue;
+          }
+        } catch (_) {}
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+      } else {
+        throw err;
+      }
+    }
+  }
+  return null;
+}
+
+function releaseCrossProcessLock(fd) {
+  if (fd !== null && fd !== undefined) {
+    try { fs.closeSync(fd); } catch (_) {}
+  }
+  try {
+    if (fs.existsSync(LOCK_FILE)) {
+      fs.unlinkSync(LOCK_FILE);
+    }
+  } catch (_) {}
+}
+
 // ── GET /api/data & /api/data.php ───────────────────────────
 app.get(['/api/data', '/api/data.php'], rateLimit(120, 60 * 1000), (req, res) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -167,6 +215,11 @@ app.post(
       }
     }
 
+    const lockFd = acquireCrossProcessLock(5000);
+    if (lockFd === null) {
+      return res.status(503).json({ error: 'Storage is currently busy. Please retry.' });
+    }
+
     try {
       const incoming = req.body.entries;
       if (!Array.isArray(incoming) || incoming.length === 0) {
@@ -183,9 +236,9 @@ app.post(
         if (fileContent.trim() !== '') {
           try {
             const parsed = JSON.parse(fileContent);
-            if (!Array.isArray(parsed)) {
-              console.error('Storage error: data.json is not an array.');
-              return res.status(500).json({ error: 'Database integrity error: existing data is malformed.' });
+            if (!validateDatasetSchema(parsed)) {
+              console.error('Storage error: data.json schema is invalid.');
+              return res.status(500).json({ error: 'Database integrity error: existing data schema is malformed.' });
             }
             existing = parsed;
           } catch (e) {
@@ -263,9 +316,37 @@ app.post(
           return (b.createdDate || '').localeCompare(a.createdDate || '');
         });
 
-        // Backup existing data before committing
+        // Verified rotating backups before committing
         if (fs.existsSync(DATA_FILE)) {
+          if (!fs.existsSync(BACKUP_DIR)) {
+            fs.mkdirSync(BACKUP_DIR, { mode: 0o700, recursive: true });
+            try {
+              fs.writeFileSync(path.join(BACKUP_DIR, '.htaccess'), 'Require all denied\n');
+            } catch (_) {}
+          }
+          const nowStr = new Date().toISOString().replace(/[:.]/g, '-');
+          const tsBackup = path.join(BACKUP_DIR, `data-${nowStr}-${process.pid}.json`);
+
+          fs.copyFileSync(DATA_FILE, tsBackup);
           fs.copyFileSync(DATA_FILE, BACKUP_FILE);
+
+          const srcSize = fs.statSync(DATA_FILE).size;
+          const bakSize = fs.statSync(tsBackup).size;
+          if (srcSize !== bakSize) {
+            throw new Error('Backup verification failed: size mismatch');
+          }
+
+          // Keep latest 10 timestamped backups
+          try {
+            const files = fs.readdirSync(BACKUP_DIR)
+              .filter(f => f.startsWith('data-') && f.endsWith('.json'))
+              .map(f => ({ name: f, time: fs.statSync(path.join(BACKUP_DIR, f)).mtimeMs }))
+              .sort((a, b) => a.time - b.time);
+            while (files.length > 10) {
+              const oldest = files.shift();
+              fs.unlinkSync(path.join(BACKUP_DIR, oldest.name));
+            }
+          } catch (_) {}
         }
 
         // Atomic write: write to temp file, then atomic rename
@@ -279,6 +360,8 @@ app.post(
     } catch (err) {
       console.error('Import error:', err);
       res.status(500).json({ error: 'Internal server error' });
+    } finally {
+      releaseCrossProcessLock(lockFd);
     }
   }
 );
